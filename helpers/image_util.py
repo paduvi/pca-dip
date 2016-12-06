@@ -1,14 +1,13 @@
 import numpy as np
 from PIL import Image, ImageStat
-import sys
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 
 def load_image(infilename):
     img = Image.open(infilename)
     img.load()
     data = np.asarray(img, dtype="int32")
+    if is_grayscale(infilename) and data.ndim == 3:
+        data = np.dot(data[..., :3], [1.0 / 3, 1.0 / 3, 1.0 / 3])
     return data
 
 

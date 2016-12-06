@@ -1,5 +1,5 @@
 from helpers import image_util, file_util
-import sys
+import sys, os
 import numpy as np
 from numpy import linalg as la
 from os.path import join
@@ -14,9 +14,12 @@ def append_column(arr, values):
 
 
 if __name__ == '__main__':
-    try:
-        k = int(sys.argv[1])
-    except ValueError:
+    if sys.argv[1]:
+        try:
+            k = int(sys.argv[1])
+        except ValueError:
+            k = 8
+    else:
         k = 8
     train_folder = 'train_data'
 
@@ -35,6 +38,12 @@ if __name__ == '__main__':
 
     log_file.close()
     size = width * height
+
+    # Log width, height of model
+    log_file = open("model/info.txt", "w")
+    log_file.write(str(height) + '\n')
+    log_file.write(str(width) + '\n')
+    log_file.close()
 
     # Step 2: Get mean-face:
     mean_face = np.mean(raw_vectors, axis=1).reshape((size, 1))  # N^2 x 1
@@ -89,7 +98,11 @@ if __name__ == '__main__':
     # print mean_face_repeat
     # print simplified_faces
     for i in range(m):
-        image_util.save_image(simplified_faces[:, i].reshape((height, width)), 'model/image/' + files[i])
+        filepath = 'model/image/' + files[i]
+        directory = os.path.dirname(filepath)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        image_util.save_image(simplified_faces[:, i].reshape((height, width)), filepath)
 
     # Show plot
     plt.show()

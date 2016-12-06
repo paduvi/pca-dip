@@ -5,14 +5,16 @@ from numpy import linalg as la
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+THRESHOLD = 0.55
 
 def predict(data):
-    # Step 1: Resize and convert to vector
-    resize_data = image_util.resize_image(data, 92, 112)
-    vector, width, height = image_util.matrix2vector(resize_data)
-
-    # Step 2: Get normalize face
+    # Step 1: Get normalize face and info
     mean_face = get_mean_face('model/mean-face.txt')
+    height, width = get_info('model/info.txt')
+
+    # Step 2: Resize and convert to vector
+    resize_data = image_util.resize_image(data, width, height)
+    vector, _, _ = image_util.matrix2vector(resize_data)
 
     # Plot mean face
     plt.figure(2)
@@ -36,16 +38,21 @@ def predict(data):
 
     # Step 4: Calculate error detection
     error = la.norm(np.subtract(normalize_face, simplified_normalize_face), axis=0)
-    if error / 255 < 20:
-        return True
-    else:
-        return False
+    return error / (width * height) < THRESHOLD
 
 
 def get_mean_face(file_path='model/mean-face.txt'):
     f = open(file_path, 'r')
     data = f.read().strip(';')
     return np.matrix(data)
+
+
+def get_info(file_path='model/info.txt'):
+    f = open(file_path, 'r')
+    data = list(f.readlines())
+    height = int(data[0].strip())
+    width = int(data[1].strip())
+    return height, width
 
 
 def get_eigenvectors(file_path='model/list-eigenvectors.txt'):

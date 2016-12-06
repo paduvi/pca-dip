@@ -4,7 +4,14 @@ import numpy as np
 
 
 def listFile(mypath):
-    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    onlyfiles = []
+    for f in listdir(mypath):
+        if not isfile(join(mypath, f)):
+            childfiles = listFile(join(mypath, f))
+            for cf in childfiles:
+                onlyfiles.append(join(f, cf))
+        else:
+            onlyfiles.append(f)
     return onlyfiles
 
 
