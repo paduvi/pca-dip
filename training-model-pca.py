@@ -1,5 +1,6 @@
 from helpers import image_util, file_util
-import sys, os
+import sys
+import os
 import numpy as np
 from numpy import linalg as la
 from os.path import join
@@ -23,7 +24,6 @@ if __name__ == '__main__':
         k = 8
     train_folder = 'train_data'
 
-    log_file = open("model/list-file.txt", "w")
     files = file_util.listFile(train_folder)
     m = len(files)
 
@@ -33,14 +33,11 @@ if __name__ == '__main__':
     for filePath in files:
         vector, width, height = image_util.img2vector(join(train_folder, filePath))  # N^2 x 1
         raw_vectors = append_column(raw_vectors, vector)
-        file_util.log_data(filePath, log_file)  # Log to text file
-        log_file.write('\n')
 
-    log_file.close()
     size = width * height
 
-    # Log width, height of model
-    log_file = open("model/info.txt", "w")
+    # Log width, height of pca-model
+    log_file = open("pca-model/info.txt", "w")
     log_file.write(str(height) + '\n')
     log_file.write(str(width) + '\n')
     log_file.close()
@@ -51,7 +48,7 @@ if __name__ == '__main__':
     plt.title('Mean Face')
     plt.imshow(mean_face.reshape((height, width)), cmap=plt.get_cmap('gray'))
 
-    log_file = open("model/mean-face.txt", "w")
+    log_file = open("pca-model/mean-face.txt", "w")
     file_util.log_data(mean_face, log_file)
     log_file.close()
     mean_face_repeat = np.repeat(mean_face, m, axis=1)
@@ -76,7 +73,7 @@ if __name__ == '__main__':
     u = np.divide(u, norm)  # Normalize u
 
     # Log Eigenvectors to text file
-    log_file = open("model/list-eigenvectors.txt", "w")
+    log_file = open("pca-model/list-eigenvectors.txt", "w")
     for i in range(k):
         file_util.log_data(u[:, i], log_file)
         log_file.write('\n')
@@ -85,7 +82,7 @@ if __name__ == '__main__':
     # Calculate and log coefficients to text file:
     coefficients = np.dot(u.transpose(), normalized_faces)  # (k x N^2) x (N^2 x M) = k x M
 
-    log_file = open("model/list-coefficient.txt", "w")
+    log_file = open("pca-model/list-coefficient.txt", "w")
     for i in range(m):
         file_util.log_data(coefficients[:, i], log_file)
         log_file.write('\n')
@@ -98,7 +95,7 @@ if __name__ == '__main__':
     # print mean_face_repeat
     # print simplified_faces
     for i in range(m):
-        filepath = 'model/image/' + files[i]
+        filepath = 'pca-model/image/' + files[i]
         directory = os.path.dirname(filepath)
         if not os.path.exists(directory):
             os.makedirs(directory)
