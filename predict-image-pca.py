@@ -5,9 +5,8 @@ from numpy import linalg as la
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-THRESHOLD = 0.55
 
-def predict(data):
+def predict(data, threshold):
     # Step 1: Get normalize face and info
     mean_face = get_mean_face('pca-model/mean-face.txt')
     height, width = get_info('pca-model/info.txt')
@@ -38,7 +37,8 @@ def predict(data):
 
     # Step 4: Calculate error detection
     error = la.norm(np.subtract(normalize_face, simplified_normalize_face), axis=0)
-    return error / (width * height) < THRESHOLD
+    print error / (width * height)
+    return error / (width * height) < threshold
 
 
 def get_mean_face(file_path='pca-model/mean-face.txt'):
@@ -75,6 +75,10 @@ def append_column(arr, values):
 
 if __name__ == '__main__':
     filename = sys.argv[1]
+    try:
+        THRESHOLD = float(sys.argv[2])
+    except IndexError:
+        THRESHOLD = 0.55
     data = image_util.load_image(filename)
     if not image_util.is_grayscale(filename):
         data = image_util.rgb2gray(data)
@@ -85,7 +89,7 @@ if __name__ == '__main__':
     plt.title('Gray Scale Image')
     plt.imshow(data, cmap=plt.get_cmap('gray'))
 
-    print predict(data)
+    print predict(data, threshold=THRESHOLD)
 
     # Show Plot
     plt.show()

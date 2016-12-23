@@ -15,12 +15,9 @@ def append_column(arr, values):
 
 
 if __name__ == '__main__':
-    if sys.argv[1]:
-        try:
-            k = int(sys.argv[1])
-        except ValueError:
-            k = 8
-    else:
+    try:
+        k = int(sys.argv[1])
+    except IndexError:
         k = 8
     train_folder = 'train_data'
 
