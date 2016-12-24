@@ -31,7 +31,7 @@ if __name__ == '__main__':
         log_file.write('\n')
     log_file.close()
 
-    # Log width, height of pca-model
+    # Log width, height of lbp-model
     height, width = data.shape
     log_file = open("lbp-model/info.txt", "w")
     log_file.write(str(height) + '\n')
