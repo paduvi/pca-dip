@@ -89,8 +89,7 @@ def extract_segment(data, debug=False):
     return histogram
 
 
-def extract_face(file_path, debug=False, log=None):
-    data = load_gray_scale_image(file_path)
+def extract_face(data, debug=False, log=None):
     height, width = data.shape
 
     present_image = np.empty([height - 2, width - 2], dtype=int)

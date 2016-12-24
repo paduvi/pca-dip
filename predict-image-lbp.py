@@ -60,21 +60,33 @@ def chi_square(s, m, threshold):
     return similarity < threshold
 
 
+def get_info(file_path='lbp-model/info.txt'):
+    f = open(file_path, 'r')
+    data = list(f.readlines())
+    height = int(data[0].strip())
+    width = int(data[1].strip())
+    return height, width
+
+
 if __name__ == '__main__':
     filename = sys.argv[1]
     try:
         THRESHOLD = float(sys.argv[2])
     except IndexError:
-        THRESHOLD = 0.02
+        THRESHOLD = 0.03
     data = image_util.load_image(filename)
     if not image_util.is_grayscale(filename):
         data = image_util.rgb2gray(data)
-    mean_histograms = get_mean_histograms()
-    local_histograms = lbp_extract_feature.extract_face(file_path=filename, log=join("output/", filename),
+    height, width = get_info()
+
+    resize_data = image_util.resize_image(data, width, height)
+    local_histograms = lbp_extract_feature.extract_face(data=resize_data, log=join("output/", filename),
                                                         debug=True)  # 20x59
     norm = la.norm(local_histograms, axis=1)
     norm = norm.reshape((20, 1))
     local_histograms = np.divide(local_histograms, norm)
+
+    mean_histograms = get_mean_histograms()
 
     result = chi_square(local_histograms, mean_histograms, threshold=THRESHOLD)
     print result

@@ -1,4 +1,4 @@
-from helpers import file_util, lbp_extract_feature
+from helpers import file_util, lbp_extract_feature, image_util
 from os.path import join
 from numpy import linalg as la
 import numpy as np
@@ -15,8 +15,10 @@ if __name__ == '__main__':
     count = 0
 
     for filePath in files:
-        local_histograms = lbp_extract_feature.extract_face(join(train_folder, filePath),
-                                                            log=join("lbp-model/image", filePath))  # 20x59
+        data = image_util.load_image(join(train_folder, filePath))
+        if not image_util.is_grayscale(join(train_folder, filePath)):
+            data = image_util.rgb2gray(data)
+        local_histograms = lbp_extract_feature.extract_face(data, log=join("lbp-model/image", filePath))  # 20x59
         norm = la.norm(local_histograms, axis=1)
         norm = norm.reshape((20, 1))
         local_histograms = np.divide(local_histograms, norm)
@@ -27,6 +29,13 @@ if __name__ == '__main__':
         count += 1
         file_util.log_data(local_histograms, log_file)
         log_file.write('\n')
+    log_file.close()
+
+    # Log width, height of pca-model
+    height, width = data.shape
+    log_file = open("lbp-model/info.txt", "w")
+    log_file.write(str(height) + '\n')
+    log_file.write(str(width) + '\n')
     log_file.close()
 
     mean_histograms = np.divide(mean_histograms, count)
